@@ -1,6 +1,32 @@
-import React from 'react';
+import axios from 'axios';
+import React, {useState} from 'react';
 import Navbar from '../../../layouts/frontend/Navbar';
 function Register() {
+    // Khai báo các trường dl
+    const [registerInput, setRegister] = useState({
+        name: '',
+        email: '',
+        password: '',
+    });
+
+    const handleInput = (e) => {
+        e.presist();
+        setRegister({...registerInput, [e.target.name]: e.target.value});
+    }
+
+    const registerSubmit = (e) => {
+        e.preventDefault();
+
+        const data = {
+            name: registerInput.name,
+            email: registerInput.password,
+            password: registerInput.password
+        }
+
+        axios.post(`/api/register`, data).then(res => {
+
+        });
+    }
     return (
         <div>
             <Navbar />
@@ -12,22 +38,18 @@ function Register() {
                                 <h4>Đăng ký</h4>
                             </div>
                             <div className='card-body'>
-                                <form>
+                                <form onSubmit={registerSubmit}>
                                     <div className='form-group mb-3'>
                                         <label>Họ tên</label>
-                                        <input type='' name='name' className='form-control'></input>
+                                        <input type='' onChange={handleInput} value={registerInput.name} name='name' className='form-control'></input>
                                     </div>
                                     <div className='form-group mb-3'>
                                         <label>Email</label>
-                                        <input type='' name='email' className='form-control'></input>
+                                        <input type='' onChange={handleInput} value={registerInput.email} name='email' className='form-control'></input>
                                     </div>
                                     <div className='form-group mb-3'>
                                         <label>Mật khẩu</label>
-                                        <input type='' name='password' className='form-control'></input>
-                                    </div>
-                                    <div className='form-group mb-3'>
-                                        <label>Xác nhận mật khẩu</label>
-                                        <input type='' name='confirm_password' className='form-control'></input>
+                                        <input type='' onChange={handleInput} value={registerInput.password} name='password' className='form-control'></input>
                                     </div>
                                     <div className='form-group mb-3'>
                                     <button type='submit' className='btn btn-primary'>Đăng ký</button>
