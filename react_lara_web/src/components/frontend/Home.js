@@ -1,7 +1,12 @@
 import React from 'react';
+import Navbar from '../../layouts/frontend/Navbar';
 function Home() {
     return (
-        <h1>This is Home Page</h1>
+       <div>
+             <Navbar />
+             <h1>Trang chủ</h1>
+       </div>
+       
     );
 }
 export default Home;
