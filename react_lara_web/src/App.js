@@ -6,6 +6,8 @@ import Login from './components/frontend/auth/Login';
 import Register from './components/frontend/auth/Register';
 import axios from 'axios';
 import AdminPrivateRoute from './AdminPrivateRoute';
+import Page403 from './components/errors/Page403';
+import Page404 from './components/errors/Page404';
 
 
 axios.defaults.baseURL = "http://localhost:8000/";
@@ -26,6 +28,8 @@ function App() {
         <Router>
           <Switch>
               <Route exact path="/" component={Home}/>
+              <Route exact path="/403" component={Page403}/>
+              <Route exact path="/404" component={Page404}/>
               <Route path="/login">
                   {localStorage.getItem('auth_token') ? <Redirect to='/' /> : <Login/>}
                  
