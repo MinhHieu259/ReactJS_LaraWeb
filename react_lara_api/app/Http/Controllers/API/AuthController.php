@@ -72,8 +72,8 @@ class AuthController extends Controller
                     $role = '';
                     $token = $user->createToken($user->email . '_Token', [''])->plainTextToken;
                 }
-                
-                
+
+
                 return response()->json([
                     'status' => 200,
                     'username' => $user->name,
