@@ -1,9 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import swal from 'sweetalert'
-function AddProduct() {
+function EditProduct(props) {
 
+    const history = useHistory();
     const [categoryList, setCategoryList] = useState([])
     const [productInput, setProduct] = useState({
         category_id : '',
@@ -19,13 +20,11 @@ function AddProduct() {
         original_price : '',
         qty : '',
         brand : '',
-        featured : '',
-        popular : '',
-        status : ''
     });
 
     const [picture, setPicture] = useState([]);
-    const [errorlist, setError] = useState([])
+    const [errorlist, setError] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const handleInput = (e) => {
         e.persist();
@@ -36,17 +35,36 @@ function AddProduct() {
         e.persist();
         setPicture({image: e.target.files[0]});
     }
+    
+    const [allcheckbox, setCheckBoxes] = useState([])
 
+    const handleCheckBox = (e) => {
+        e.persist();
+        setCheckBoxes({...allcheckbox, [e.target.name]:e.target.checked});
+    }
     useEffect(() => {
         axios.get(`api/all-category`).then(res => {
             if (res.data.status === 200) {
                 setCategoryList(res.data.category);
             }
         });
-    }, []);
 
-    const submitProduct = (e) => {
+        const product_id = props.match.params.id;
+        axios.get(`/api/edit-product/${product_id}`).then(res=>{
+            if(res.data.status === 200){
+                setProduct(res.data.product);
+                setCheckBoxes(res.data.product);
+            } else if(res.data.status === 404){
+                swal("Lỗi", res.data.message, "error");
+                history.push('/admin/view-product');
+            }
+            setLoading(false);
+        });
+    }, [props.match.params.id, history]);
+
+    const updateProduct = (e) => {
         e.preventDefault();
+        const product_id = props.match.params.id;
         const formData = new FormData();
         formData.append('image', picture.image);
         formData.append('category_id', productInput.category_id);
@@ -62,47 +80,39 @@ function AddProduct() {
         formData.append('original_price', productInput.original_price);
         formData.append('qty', productInput.qty);
         formData.append('brand', productInput.brand);
-        formData.append('featured', productInput.featured);
-        formData.append('popular', productInput.popular);
-        formData.append('status', productInput.status);
+        formData.append('featured', allcheckbox.featured ? '1' : '0');
+        formData.append('popular', allcheckbox.popular ? '1' : '0');
+        formData.append('status', allcheckbox.status ? '1' : '0');
 
-        axios.post(`/api/store-product`, formData).then(res => {
+        axios.post(`/api/update-product/${product_id}`, formData).then(res => {
             if(res.data.status === 200){
                 swal("Thành công", res.data.message, "success");
-                setProduct({...productInput,
-                    category_id : '',
-                    slug : '',
-                    name : '',
-                    description : '',
-                    meta_title : '',
-                    meta_keyword : '',
-                    meta_descrip : '',
-                    selling_price : '',
-                    original_price : '',
-                    qty : '',
-                    brand : '',
-                    featured : '',
-                    popular : '',
-                    status : ''
-                });
+                console.log(allcheckbox);
                 setError([]);
             } else if(res.data.status === 422) {
-                swal("Dữ liệu không được để trống", "error");
+                swal("Dữ liệu không được để trống","", "error");
                 setError(res.data.errors);
+            } else if(res.data.status === 404) {
+                swal("Lỗi",res.data.message, "error");
+                history.push('/admin/view-product');
             }
         });
+    }
+
+    if(loading){
+        return <h4>Đang tải dữ liệu...</h4>
     }
 
     return (
         <div className='container-fluid px-4'>
             <div className='card-mt-4'>
                 <div className='card-header'>
-                    <h4>Thêm sản phẩm
+                    <h4>Cập nhật sản phẩm
                         <Link to="/admin/view-product" className='btn btn-primary btn-sm float-end'>Danh sách</Link>
                     </h4>
                 </div>
                 <div className='card-body'>
-                    <form onSubmit={submitProduct} encType='multipart/form-data'>
+                    <form onSubmit={updateProduct} encType='multipart/form-data'>
                         <ul className="nav nav-tabs" id="myTab" role="tablist">
                             <li className="nav-item" role="presentation">
                                 <button className="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Home</button>
@@ -198,27 +208,28 @@ function AddProduct() {
                                     <div className='col-md-8 form-group mb-3'>
                                         <label>Image</label>
                                         <input type="file" name="image" onChange={handleImage} className='form-control' />
+                                        <img src={`http://localhost:8000/${productInput.image}`} width="50px"/>
                                         <small className='text-danger'>{errorlist.image}</small>
                                     </div>
 
                                     <div className='col-md-4 form-group mb-3'>
                                         <label>Featured</label>
-                                        <input type="checkbox" name="featured" onChange={handleInput} value={productInput.featured} className='w-50 h-50' />
+                                        <input type="checkbox" name="featured" onChange={handleCheckBox} defaultChecked={allcheckbox.featured === 1 ? true : false} className='w-50 h-50' />
                                     </div>
 
                                     <div className='col-md-4 form-group mb-3'>
                                         <label>Popular</label>
-                                        <input type="checkbox" name="popular" onChange={handleInput} value={productInput.popular} className='w-50 h-50' />
+                                        <input type="checkbox" name="popular" onChange={handleCheckBox} defaultChecked={allcheckbox.popular === 1 ? true : false} className='w-50 h-50' />
                                     </div>
 
                                     <div className='col-md-4 form-group mb-3'>
                                         <label>Status</label>
-                                        <input type="checkbox" name="status" onChange={handleInput} value={productInput.status} className='w-50 h-50' />
+                                        <input type="checkbox" name="status" onChange={handleCheckBox} defaultChecked={allcheckbox.status === 1 ? true : false} className='w-50 h-50' />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button type='submit' className='btn btn-primary px-4 mt-2'>Add Product</button>
+                        <button type='submit' className='btn btn-primary px-4 mt-2'>Cập nhật</button>
                     </form>
                 </div>
             </div>
@@ -226,4 +237,4 @@ function AddProduct() {
     );
 }
 
-export default AddProduct;
+export default EditProduct;
