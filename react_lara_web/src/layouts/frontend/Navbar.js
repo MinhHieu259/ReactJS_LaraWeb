@@ -57,7 +57,7 @@ function Navbar() {
               <Link className="nav-link" aria-current="page" to="/contact">Liên hệ</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" aria-current="page" to="#">Collection</Link>
+              <Link className="nav-link" aria-current="page" to="/collections">Danh mục</Link>
             </li>
             {AuthButtons}
 

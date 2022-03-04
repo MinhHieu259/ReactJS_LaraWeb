@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+
 Route::get('getCategory', [FrontendController::class, 'category']);
+Route::get('fetchProducts/{slug}', [FrontendController::class, 'product']);
 
 Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
     Route::get('/checkingAuthenticated', function () {
