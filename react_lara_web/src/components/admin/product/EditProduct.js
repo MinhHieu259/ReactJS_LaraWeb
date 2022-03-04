@@ -36,11 +36,11 @@ function EditProduct(props) {
         setPicture({image: e.target.files[0]});
     }
     
-    const [allcheckbox, setCheckBoxes] = useState([])
+    const [allcheckbox, setCheckBoxes] = useState([]);
 
     const handleCheckBox = (e) => {
         e.persist();
-        setCheckBoxes({...allcheckbox, [e.target.name]:e.target.checked});
+        setCheckBoxes({...allcheckbox,[e.target.name]:e.target.checked});
     }
     useEffect(() => {
         axios.get(`api/all-category`).then(res => {
@@ -213,17 +213,17 @@ function EditProduct(props) {
                                     </div>
 
                                     <div className='col-md-4 form-group mb-3'>
-                                        <label>Featured</label>
+                                        <label>Featured (Chọn = Hiện)</label>
                                         <input type="checkbox" name="featured" onChange={handleCheckBox} defaultChecked={allcheckbox.featured === 1 ? true : false} className='w-50 h-50' />
                                     </div>
 
                                     <div className='col-md-4 form-group mb-3'>
-                                        <label>Popular</label>
+                                        <label>Popular (Chọn = Hiện)</label>
                                         <input type="checkbox" name="popular" onChange={handleCheckBox} defaultChecked={allcheckbox.popular === 1 ? true : false} className='w-50 h-50' />
                                     </div>
 
                                     <div className='col-md-4 form-group mb-3'>
-                                        <label>Status</label>
+                                        <label>Status (Chọn = Ẩn)</label>
                                         <input type="checkbox" name="status" onChange={handleCheckBox} defaultChecked={allcheckbox.status === 1 ? true : false} className='w-50 h-50' />
                                     </div>
                                 </div>

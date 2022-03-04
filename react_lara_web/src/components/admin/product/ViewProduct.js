@@ -21,7 +21,13 @@ function ViewProduct() {
     if (loading) {
         return <h4>Đang tải...</h4>
     } else {
+        var productStatus = '';
         disPlayProductData = viewProduct.map((item) => {
+            if(item.status == '0'){
+                productStatus = 'Hiện';
+            } else if(item.status == '1'){
+                productStatus = 'Ẩn';
+            }
             return (
                 <tr key={item.id}>
                     <td>{item.id}</td>
@@ -32,7 +38,9 @@ function ViewProduct() {
                     <td>
                         <Link to={`edit-product/${item.id}`} className='btn btn-success btn-sm'>Sửa</Link>
                     </td>
-                    <td><button type='button' className='btn btn-danger btn-sm'>Xóa</button></td>
+                    <td>
+                        {productStatus}
+                    </td>
                 </tr>
             );
         });
@@ -56,7 +64,7 @@ function ViewProduct() {
                                 <th>Giá KM</th>
                                 <th>Ảnh</th>
                                 <th>Sửa</th>
-                                <th>Xóa</th>
+                                <th>Trạng thái</th>
                             </tr>
                         </thead>
                         <tbody>
