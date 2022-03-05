@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\FrontendController;
 use App\Http\Controllers\API\ProductController;
@@ -12,6 +13,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::get('getCategory', [FrontendController::class, 'category']);
 Route::get('fetchProducts/{slug}', [FrontendController::class, 'product']);
 Route::get('viewProductDetail/{category_slug}/{product_slug}', [FrontendController::class, 'viewproduct']);
+Route::post('add-to-cart', [CartController::class, 'addtocart']);
 
 Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
     Route::get('/checkingAuthenticated', function () {

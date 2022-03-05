@@ -8,6 +8,7 @@ function ProductDetail(props) {
     const history = useHistory();
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState([]);
+    const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         let isMounted = true;
@@ -30,6 +31,37 @@ function ProductDetail(props) {
         }
     }, [props.match.params.category, props.match.params.product, history]);
 
+    const handleDecrement = () => {
+        if(quantity > 1){
+            setQuantity(prevCount => prevCount - 1);
+        }
+    }
+
+    const handleIncrement = () => {
+        if(quantity < 10){
+            setQuantity(prevCount => prevCount + 1);
+        }
+    }
+
+    const submitAddtoCart = (e) => {
+        e.preventDefault();
+        const data = {
+            product_id : product.id,
+            product_qty : quantity
+        }
+        axios.post(`/api/add-to-cart`, data).then(res => {
+            if(res.data.status === 201){
+                swal('Thành công', res.data.message, "success");
+            } else if(res.data.status === 409){
+                swal('Cảnh báo', res.data.message, "warning");
+            }  else if(res.data.status === 401){
+                swal('Lỗi', res.data.message, "error");
+            } else if(res.data.status === 404){
+                swal('Cảnh báo', res.data.message, "warning");
+            }
+        });
+    }
+
     if (loading) {
         return <h4>Đang tải chi tiết sản phẩm...</h4>
     } else {
@@ -40,13 +72,13 @@ function ProductDetail(props) {
                 <div className='row'>
                     <div className='col-md-3 mt-3'>
                         <div className='input-group'>
-                            <button type='button' className='input-group-text'>-</button>
-                            <input type='text' className='form-control text-center'/>
-                            <button type='button' className='input-group-text'>+</button>
+                            <button type='button' onClick={handleDecrement} className='input-group-text'>-</button>
+                            <div className='form-control text-center'>{quantity}</div>
+                            <button type='button' onClick={handleIncrement} className='input-group-text'>+</button>
                         </div>
                     </div>
                     <div className='col-md-3 mt-3'>
-                        <button type='botton' className='btn btn-primary w-100'>Thêm giỏ hàng</button>
+                        <button type='botton' className='btn btn-primary w-100' onClick={submitAddtoCart}>Thêm giỏ hàng</button>
                     </div>
                 </div>
             </div>
