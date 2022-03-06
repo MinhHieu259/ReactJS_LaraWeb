@@ -25,7 +25,10 @@ class CartController extends Controller
                 } else{
                     $cartItem = new Cart();
                     $cartItem->user_id = $user_id;
-                    
+                    $cartItem->product_id = $product_id;
+                    $cartItem->product_qty = $product_qty;
+                    $cartItem->save();
+
                     return response()->json([
                         'status' => 201,
                         'message' => 'Thêm giỏ hàng thành công'
@@ -42,6 +45,23 @@ class CartController extends Controller
             return response()->json([
                 'status' => 401,
                 'message' => 'Đăng nhập để thêm giỏ hàng'
+            ]);
+        }
+    }
+
+    public function viewcart()
+    {
+        if(auth('sanctum')->check()){
+            $user_id = auth('sanctum')->user()->id;
+            $cart_item = Cart::where('user_id', $user_id)->get();
+            return response()->json([
+                'status' => 200,
+                'cart' => $cart_item
+            ]);
+        } else {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Đăng nhập để xem giỏ hàng'
             ]);
         }
     }

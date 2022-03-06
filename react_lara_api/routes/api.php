@@ -14,6 +14,7 @@ Route::get('getCategory', [FrontendController::class, 'category']);
 Route::get('fetchProducts/{slug}', [FrontendController::class, 'product']);
 Route::get('viewProductDetail/{category_slug}/{product_slug}', [FrontendController::class, 'viewproduct']);
 Route::post('add-to-cart', [CartController::class, 'addtocart']);
+Route::get('cart', [CartController::class, 'viewcart']);
 
 Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
     Route::get('/checkingAuthenticated', function () {
