@@ -13,8 +13,12 @@ Route::post('login', [AuthController::class, 'login']);
 Route::get('getCategory', [FrontendController::class, 'category']);
 Route::get('fetchProducts/{slug}', [FrontendController::class, 'product']);
 Route::get('viewProductDetail/{category_slug}/{product_slug}', [FrontendController::class, 'viewproduct']);
+//Cart
 Route::post('add-to-cart', [CartController::class, 'addtocart']);
 Route::get('cart', [CartController::class, 'viewcart']);
+Route::put('cart-updatequantity/{cart_id}/{scope}', [CartController::class, 'updatequantity']);
+Route::delete('delete-cartitem/{cart_id}', [CartController::class, 'deletecartitem']);
+
 
 Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
     Route::get('/checkingAuthenticated', function () {

@@ -65,4 +65,52 @@ class CartController extends Controller
             ]);
         }
     }
+
+    public function updatequantity($cart_id, $scope)
+    {
+        if(auth('sanctum')->check()){
+            $user_id = auth('sanctum')->user()->id;
+            $cart_item = Cart::where('id', $cart_id)->where('user_id', $user_id)->first();
+            if($scope == "inc"){
+                $cart_item->product_qty += 1;
+            } else  if($scope == "dec"){
+                $cart_item->product_qty -= 1;
+            }
+            $cart_item->update();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Cập nhật giỏ hàng thành công'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Đăng nhập để cập nhật'
+            ]);
+        }
+    }
+
+    public function deletecartitem($cart_id)
+    {
+        if(auth('sanctum')->check()){
+            $user_id = auth('sanctum')->user()->id;
+            $cart_item = Cart::where('id', $cart_id)->where('user_id', $user_id)->first();
+            if($cart_item){
+                $cart_item->delete();
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Xóa giỏ hàng thành công'
+                ]);
+            }else{
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Không tìm thấy sp trong giỏ'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Đăng nhập để xóa'
+            ]);
+        }
+    }
 }
