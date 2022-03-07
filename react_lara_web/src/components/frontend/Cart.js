@@ -10,7 +10,7 @@ function Cart(props) {
     const [cart, setCart] = useState([]);
     var totalCartPrice = 0;
 
-    if(!localStorage.getItem('auth_token')){
+    if (!localStorage.getItem('auth_token')) {
         history.push('/');
         swal("Lỗi", "Đăng nhập để xem giỏ hàng", "warning");
     }
@@ -34,26 +34,26 @@ function Cart(props) {
     }, [history]);
 
     const handleDecrement = (cart_id) => {
-        setCart(cart => 
-          cart.map( (item) => 
-            cart_id === item.id ? {...item, product_qty: item.product_qty - (item.product_qty > 1 ? 1:0)} : item
-          )
+        setCart(cart =>
+            cart.map((item) =>
+                cart_id === item.id ? { ...item, product_qty: item.product_qty - (item.product_qty > 1 ? 1 : 0) } : item
+            )
         );
         updateCartQuantity(cart_id, 'dec');
     }
 
     const handleIncrement = (cart_id) => {
-        setCart(cart => 
-            cart.map( (item) => 
-              cart_id === item.id ? {...item, product_qty: item.product_qty + (item.product_qty < 10 ? 1:0)} : item
+        setCart(cart =>
+            cart.map((item) =>
+                cart_id === item.id ? { ...item, product_qty: item.product_qty + (item.product_qty < 10 ? 1 : 0) } : item
             )
-          );
-          updateCartQuantity(cart_id, 'inc');
+        );
+        updateCartQuantity(cart_id, 'inc');
     }
 
-    function updateCartQuantity(cart_id, scope){
+    function updateCartQuantity(cart_id, scope) {
         axios.put(`/api/cart-updatequantity/${cart_id}/${scope}`).then(res => {
-            if(res.data.status === 200){
+            if (res.data.status === 200) {
                 swal('Thành công', res.data.message, "success");
             }
         });
@@ -65,10 +65,10 @@ function Cart(props) {
         thisClicked.innerText = "Đang xóa...";
 
         axios.delete(`/api/delete-cartitem/${cart_id}`).then(res => {
-            if(res.data.status === 200){
+            if (res.data.status === 200) {
                 swal("Thành công", res.data.message, "success");
                 thisClicked.closest("tr").remove();
-            }else if(res.data.status === 404){
+            } else if (res.data.status === 404) {
                 swal("Lỗi", res.data.message, "error");
                 thisClicked.innerText = "Xóa";
             }
@@ -80,46 +80,67 @@ function Cart(props) {
     }
 
     var cart_HTML = '';
-    if(cart.length > 0){
-        cart_HTML = <div className='table-responsive'>
-        <table className='table table-bordered'>
-            <thead>
-                <tr>
-                    <th>Ảnh</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Số lượng</th>
-                    <th>Tổng tiền</th>
-                    <th>Xóa</th>
-                </tr>
-            </thead>
-            <tbody>
-            {cart.map((item, idx) => {
-                totalCartPrice += item.product.selling_price * item.product_qty;
-                return (
-                <tr key={idx}>
-                    <td width="10%">
-                        <img src={`http://localhost:8000/${item.product.image}`} alt={item.product.name} width="50px" height="50px" />
-                    </td>
-                    <td>{item.product.name}</td>
-                    <td width='15%' className='text-center'>{item.product.selling_price}</td>
-                    <td width="15%">
-                        <div className='input-group'>
-                            <button type='button' onClick={() => handleDecrement(item.id)} className='input-group-text'>-</button>
-                            <div className='form-control text-center'>{item.product_qty}</div>
-                            <button type='button' onClick={() => handleIncrement(item.id)}  className='input-group-text'>+</button>
-                        </div>
-                    </td>
-                    <td width="15%" className='text-center'>{item.product.selling_price * item.product_qty}</td>
-                    <td width="10%">
-                        <button type='button' onClick={(e) => deleteCartItem(e, item.id)} className='btn btn-danger btn-sm'>Xóa</button>
-                    </td>
-                </tr>
-                );
-            })}
-            </tbody>
-        </table>
-    </div>
+    if (cart.length > 0) {
+        cart_HTML = <div>
+            <div className='table-responsive'>
+                <table className='table table-bordered'>
+                    <thead>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Tổng tiền</th>
+                            <th>Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {cart.map((item, idx) => {
+                            totalCartPrice += item.product.selling_price * item.product_qty;
+                            return (
+                                <tr key={idx}>
+                                    <td width="10%">
+                                        <img src={`http://localhost:8000/${item.product.image}`} alt={item.product.name} width="50px" height="50px" />
+                                    </td>
+                                    <td>{item.product.name}</td>
+                                    <td width='15%' className='text-center'>{item.product.selling_price}</td>
+                                    <td width="15%">
+                                        <div className='input-group'>
+                                            <button type='button' onClick={() => handleDecrement(item.id)} className='input-group-text'>-</button>
+                                            <div className='form-control text-center'>{item.product_qty}</div>
+                                            <button type='button' onClick={() => handleIncrement(item.id)} className='input-group-text'>+</button>
+                                        </div>
+                                    </td>
+                                    <td width="15%" className='text-center'>{item.product.selling_price * item.product_qty}</td>
+                                    <td width="10%">
+                                        <button type='button' onClick={(e) => deleteCartItem(e, item.id)} className='btn btn-danger btn-sm'>Xóa</button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className='row'>
+                <div className='col-md-8'>
+
+                </div>
+
+                <div className='col-md-4'>
+                    <div className='card card-body mt-3'>
+                        <h4>Tổng tiền:
+                            <span className='float-end'>{totalCartPrice}</span>
+                        </h4>
+                        <h4>Thành tiền:
+                            <span className='float-end'>{totalCartPrice}</span>
+                        </h4>
+                        <hr />
+                        <Link to="/checkout" className='btn btn-primary'>Thanh toán</Link>
+                    </div>
+                </div>
+            </div>
+        </div>
     } else {
         cart_HTML = <div>
             <div className='card card-body py-5 text-center shadow-sm'>
@@ -143,22 +164,7 @@ function Cart(props) {
                             {cart_HTML}
                         </div>
 
-                        <div className='col-md-8'>
 
-                        </div>
-
-                        <div className='col-md-4'>
-                            <div className='card card-body mt-3'>
-                                <h4>Tổng tiền:
-                                    <span className='float-end'>{totalCartPrice}</span>
-                                </h4>
-                                <h4>Thành tiền:
-                                    <span className='float-end'>{totalCartPrice}</span>
-                                </h4>
-                                <hr/>
-                                <Link to="/checkout" className='btn btn-primary'>Thanh toán</Link>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
