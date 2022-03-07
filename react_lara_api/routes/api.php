@@ -22,6 +22,7 @@ Route::delete('delete-cartitem/{cart_id}', [CartController::class, 'deletecartit
 
 //Checkout
 Route::post('place-order', [CheckoutController::class, 'placeorder']);
+Route::post('validate-order', [CheckoutController::class, 'validateOrder']);
 
 Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
     Route::get('/checkingAuthenticated', function () {

@@ -54,6 +54,79 @@ function Checkout(props) {
     if (loading) {
         return <h4>Đang tải thanh toán...</h4>
     }
+    const submitOrder = (e, payment_mode) => {
+        e.preventDefault();
+        var data = {
+            firstname: checkoutInput.firstname,
+            lastname: checkoutInput.lastname,
+            phone: checkoutInput.phone,
+            email: checkoutInput.email,
+            address: checkoutInput.address,
+            city: checkoutInput.city,
+            state: checkoutInput.state,
+            zipcode: checkoutInput.zipcode,
+            payment_mode: payment_mode,
+            payment_id: ''
+        };
+
+        switch (payment_mode) {
+            case 'cod':
+                axios.post(`/api/place-order`, data).then(res => {
+                    if (res.data.status === 200) {
+                        swal("Thành công", res.data.message, "success");
+                        setError([]);
+                        history.push('/thank-you');
+                    } else if (res.data.status === 422) {
+                        swal("Không được để trống thông tin", "", "error");
+                        setError(res.data.errors);
+                    }
+                });
+                break;
+
+            case 'razorpay':
+                axios.post(`/api/validate-order`, data).then(res => {
+                    if (res.data.status === 200) {
+                        setError([]);
+                        var options = {
+                            "key": "rzp_test_5AEIUNtEJxBPv5",
+                            "amount": (totalCartPrice),
+                            "name": "Shop Minh Hieu",
+                            "description": "Thank you for purcharsing in my shop",
+                            "image": "https://example.com/your_logo",
+                            "handler": function (response){
+                                console.log(response.razorpay_payment_id);
+                                data.payment_id = response.razorpay_payment_id;
+                                axios.post(`/api/place-order`, data).then(place_res => {
+                                    if (place_res.data.status === 200) {
+                                        swal("Thành công", res.data.message, "success");
+                                        setError([]);
+                                        history.push('/thank-you');
+                                    } 
+                                });
+                            },
+                            "prefill": {
+                                "name": data.firstname + data.lastname,
+                                "email": data.email,
+                                "contact": data.phone
+                            },
+                            "theme": {
+                                "color": "#3399cc"
+                            }
+                        };
+                        var rzp = new window.Razorpay(options);
+                        rzp.open();
+                    } else if (res.data.status === 422) {
+                        swal("Không được để trống thông tin", "", "error");
+                        setError(res.data.errors);
+                    }
+                });
+                break;
+
+            default:
+                break;
+        }
+
+    };
 
     var checkout_HTML = '';
     if (cart.length > 0) {
@@ -132,7 +205,8 @@ function Checkout(props) {
 
                                 <div className='col-md-12'>
                                     <div className='form-group text-end'>
-                                        <button type='button' onClick={submitOrder} className='btn btn-primary'>Đặt hàng</button>
+                                        <button type='button' onClick={(e) => submitOrder(e, 'cod')} className='btn btn-primary'>Đặt hàng</button>
+                                        <button type='button' onClick={(e) => submitOrder(e, 'razorpay')} className='btn btn-primary'>Thanh toán Online</button>
                                     </div>
                                 </div>
                             </div>
@@ -180,31 +254,7 @@ function Checkout(props) {
 
     }
 
-    const submitOrder = (e) => {
-        e.preventDefault();
-        const data = {
-            firstname: checkoutInput.firstname,
-            lastname: checkoutInput.lastname,
-            phone: checkoutInput.phone,
-            email: checkoutInput.email,
-            address: checkoutInput.address,
-            city: checkoutInput.city,
-            state: checkoutInput.state,
-            zipcode: checkoutInput.zipcode,
-        };
 
-        axios.post(`/api/place-order`, data).then(res => {
-            if (res.data.status === 200) {
-                swal("Thành công", res.data.message, "success");
-                setError([]);
-                history.push('/thank-you');
-            } else if (res.data.status === 422) {
-                swal("Không được để trống thông tin", "", "error");
-                setError(res.data.errors);
-            }
-        });
-
-    };
 
     return (
         <div>

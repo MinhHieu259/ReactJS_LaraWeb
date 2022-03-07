@@ -42,7 +42,8 @@ class CheckoutController extends Controller
                 $order->state = $request->state;
                 $order->zipcode = $request->zipcode;
 
-                $order->payment_mode = "COD";
+                $order->payment_mode = $request->payment_mode;
+                $order->payment_id = $request->payment_id;
                 $order->tracking_no = 'minhhieu'.rand(1111,9999);
                 $order->save();
 
@@ -61,6 +62,40 @@ class CheckoutController extends Controller
                 }
                 $order->orderitems()->createMany($orderitems);
                 Cart::destroy($cart);
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Đặt hàng thành công'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Đăng nhập để đặt hàng'
+            ]);
+        }
+    }
+
+    public function validateOrder(Request $request)
+    {
+        if(auth('sanctum')->check()){
+            $validator = Validator::make($request->all(), [
+                'firstname' => 'required|max:191',
+                'lastname' => 'required|max:191',
+                'phone' => 'required|max:191',
+                'email' => 'required|max:191',
+                'address' => 'required|max:191',
+                'city' => 'required|max:191',
+                'state' => 'required|max:191',
+                'zipcode' => 'required|max:191'
+            ]);
+
+            if($validator->fails()){
+                return response()->json([
+                    'status' => 422,
+                    'errors' => $validator->getMessageBag()
+                ]);
+            } else {
+
                 return response()->json([
                     'status' => 200,
                     'message' => 'Đặt hàng thành công'
